@@ -1,12 +1,23 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as colors 
+import matplotlib.colors as colors
 from itertools import count
 import json
 import networkx as nx
 
 def create_product_space(df_plot_dataframe=None,df_plot_node_col=['node'],df_plot_attribute_cols=['color','node_size']):
+    """
+    Creates product space visualizations similar to the Atlas
+
+    Args:
+        df_plot_dataframe: DataFrame with node attributes
+        df_plot_node_col: Column corresponding to the node name
+        df_plot_attribute_cols: Columns corresponding to the noe attributes
+
+    Returns:
+        Plot object containing the product space visualization
+    """
     # Load coordinates of nodes (original Atlas file)
     networkjs = json.load(open('data/network_hs92_4digit.json'))
     # Get nodes +  positions from json format into python list + dictionary
@@ -29,13 +40,13 @@ def create_product_space(df_plot_dataframe=None,df_plot_node_col=['node'],df_plo
     dfe2.drop_duplicates(inplace=True)
     dfe2.rename(columns={0: 'node'}, inplace=True)
     dfn2 = pd.merge(df_plot_dataframe,dfe2,how='left',left_on=df_plot_node_col,right_on='node',indicator=True)
-    # now drop products from this dataframe that are not in product space 
+    # now drop products from this dataframe that are not in product space
     dfn2 = dfn2[dfn2['_merge']=='both']
     # Now create networkx objects:
     # - G = only products from trade data that will be plotted
     G=nx.from_pandas_edgelist(dfn2,'hs_product_code','hs_product_code')
-    # - G2 = all nodes + edges from original product space 
-    # -- these will be gray in the background, i.e. products for which there is no info 
+    # - G2 = all nodes + edges from original product space
+    # -- these will be gray in the background, i.e. products for which there is no info
     # -- in this example, only products from Ukraine with exports > $ 40 mil.
     G2=nx.from_pandas_edgelist(dfe,'src','trg')
     # Now add node attributes to networkx objects
@@ -58,17 +69,16 @@ def create_product_space(df_plot_dataframe=None,df_plot_node_col=['node'],df_plo
             try:
                 G.node[i][ATTRIBUTE] = dft_dict[i]
             except Exception:
-                G.node[i][ATTRIBUTE] = 'Missing' 
+                G.node[i][ATTRIBUTE] = 'Missing'
         for i in sorted(G2.nodes()):
             try:
                 G2.node[i][ATTRIBUTE] = dft_dict[i]
             except Exception:
-                G2.node[i][ATTRIBUTE] = 'Missing' 
+                G2.node[i][ATTRIBUTE] = 'Missing'
     # Cross-check that attributes have been added correctly
-    """
-    nx.get_node_attributes(G2,'color')
-    nx.get_node_attributes(G,'color')
-    """
+    # nx.get_node_attributes(G2,'color')
+    # nx.get_node_attributes(G,'color')
+
     # Create color + size lists that networkx can use when plotting
     groups = set(nx.get_node_attributes(G2,'color').values())
     mapping = dict(zip(sorted(groups),count()))
@@ -96,4 +106,3 @@ def create_product_space(df_plot_dataframe=None,df_plot_node_col=['node'],df_plo
     plt.savefig(output_dir_image)
     # show
     plt.show()
-
