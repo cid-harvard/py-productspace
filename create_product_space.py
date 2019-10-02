@@ -46,11 +46,8 @@ def create_product_space(df_plot_dataframe=None,
     dfe2 = pd.DataFrame(np.append(dfe['src'].values, dfe['trg'].values))
     dfe2.drop_duplicates(inplace=True)
     dfe2.rename(columns={0: 'node'}, inplace=True)
-    dfn2 = pd.merge(df_plot_dataframe, dfe2, how='left',
-                    left_on=df_plot_node_col, right_on='node', indicator=True)
-
-    # now drop products from this dataframe that are not in product space
-    dfn2 = dfn2[dfn2['_merge'] == 'both']
+    dfn2 = pd.merge(df_plot_dataframe, dfe2, how='inner',
+                    left_on=df_plot_node_col, right_on='node')
 
     # Now create networkx objects:
     # - G = only products from trade data that will be plotted
