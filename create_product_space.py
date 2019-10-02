@@ -9,7 +9,8 @@ import networkx as nx
 
 def create_product_space(df_plot_dataframe=None,
                          df_plot_node_col=['node'],
-                         df_plot_attribute_cols=['color', 'node_size']):
+                         df_plot_attribute_cols=['color', 'node_size'],
+                         save_to_file=None):
     """
     Creates customizable product space visualizations similar to the Atlas
 
@@ -17,9 +18,10 @@ def create_product_space(df_plot_dataframe=None,
         df_plot_dataframe: DataFrame with node attributes
         df_plot_node_col: Column corresponding to the node name
         df_plot_attribute_cols: Columns corresponding to the noe attributes
+        save_to_file (optional): Filepath to save the visualization to
 
     Returns:
-        Plot object containing the product space visualization
+        Matplotlib axis object containing the product space visualization
     """
     # Load coordinates of nodes (original Atlas file)
     networkjs = json.load(open('data/network_hs92_4digit.json'))
@@ -103,10 +105,9 @@ def create_product_space(df_plot_dataframe=None,
     # (e.g. if you want to zoom in into the product space and thus set a higher resolution, you may want to set this higher)
     sizesl2 = [G.node[n]['node_size'] * 350 for n in nodes]
     # Now draw the product space
-    f = plt.figure(1, figsize=(20, 20))
-    ax = f.add_subplot(1, 1, 1)
+    f, ax = plt plt.subplots(1, 1, figsize=(20, 20))
     # turn axes off
-    plt.axis('off')
+    ax.axis('off')
     # set white background
     f.set_facecolor('white')
     # now draw full product space in background, transparent with small node_size
@@ -115,7 +116,9 @@ def create_product_space(df_plot_dataframe=None,
     # now draw the product space based on the data (e.g. trade data)
     nx.draw_networkx(G, nodes_pos, node_color=colorsl, ax=ax,
                      node_size=sizesl2, with_labels=False, alpha=1)
-    # save file
-    plt.savefig(output_dir_image)
+    if save_to_file is not None:
+        # save file
+        ax.savefig(output_dir_image)
     # show
-    plt.show()
+    ax.show()
+    return(ax)
