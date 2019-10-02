@@ -10,7 +10,7 @@ import networkx as nx
 def create_product_space(df_plot_dataframe=None,
                          df_plot_node_col=['node'],
                          df_plot_attribute_cols=['color', 'node_size'],
-                         save_to_file=None):
+                         out_file=None):
     """
     Creates customizable product space visualizations similar to the Atlas
 
@@ -18,7 +18,7 @@ def create_product_space(df_plot_dataframe=None,
         df_plot_dataframe: DataFrame with node attributes
         df_plot_node_col: Column corresponding to the node name
         df_plot_attribute_cols: Columns corresponding to the noe attributes
-        save_to_file (optional): Filepath to save the visualization to
+        out_file (optional): Filepath to save the visualization to
 
     Returns:
         Matplotlib axis object containing the product space visualization
@@ -116,9 +116,9 @@ def create_product_space(df_plot_dataframe=None,
     # now draw the product space based on the data (e.g. trade data)
     nx.draw_networkx(G, nodes_pos, node_color=colorsl, ax=ax,
                      node_size=sizesl2, with_labels=False, alpha=1)
-    if save_to_file is not None:
+    if out_file is not None:
         # save file
         ax.savefig(output_dir_image)
     # show
-    ax.show()
+    plt.show()
     return(ax)
