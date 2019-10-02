@@ -105,7 +105,7 @@ def create_product_space(df_plot_dataframe=None,
     # (e.g. if you want to zoom in into the product space and thus set a higher resolution, you may want to set this higher)
     sizesl2 = [G.node[n]['node_size'] * 350 for n in nodes]
     # Now draw the product space
-    f, ax = plt plt.subplots(1, 1, figsize=(20, 20))
+    f, ax = plt.subplots(1, 1, figsize=(20, 20))
     # turn axes off
     ax.axis('off')
     # set white background
