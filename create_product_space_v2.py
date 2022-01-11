@@ -7,15 +7,21 @@ import json
 import networkx as nx
 
 
-def create_product_space(df_plot_dataframe=None,
+def create_product_space(df_plot_dataframe_filename = None,
+                         df_plot_dataframe=None,
                          df_plot_node_col=None,
-                         df_node_size_col=None):
+                         df_node_size_col=None,
+                         output_image_file=None
+                         ):
 
     # No legend, not properly coded yet
     show_legend = 0
 
-    # Copy dataframe so original won't be overwritten
-    df_plot =  df_plot_dataframe.copy()
+    # Define plot dataframe
+    if df_plot_dataframe_filename != None:
+        df_plot = pd.read_csv(df_plot_dataframe_filename)
+    else:
+        df_plot =  df_plot_dataframe.copy()
 
     NORMALIZE_NODE_SIZE = 1
     if NORMALIZE_NODE_SIZE == 1:
@@ -52,20 +58,20 @@ def create_product_space(df_plot_dataframe=None,
     if ADD_COLORS_ATLAS == 1:
 
         # First add product codes from original file (full strings were used for illustrative purposes above but we need the actual codes to merge data from other sources, e.g. node colors)
-        df_plot = pd.merge(df_plot,df_orig[['product_name','product_code']].drop_duplicates(),how='left',on='product_name')
-        dft = pd.read_csv('https://www.dropbox.com/s/rlm8hu4pq0nkg63/hs4_hex_colors_intl_atlas.csv?dl=1')
-
+        # df_plot = pd.merge(df_plot,df_orig[['product_name','product_code']].drop_duplicates(),how='left',on='product_name')
         # Transform product_code into int (accounts for missing in pandas, if necessary)
         # keep only numeric product_codes (this drops 'unspecified' as well as services for now;
         # - as the latter needs a separate color classification)
         df_plot = df_plot[df_plot['product_code'].astype(str).str.isnumeric()]
         # -- also drop 9999 product code; unknown
         df_plot = df_plot[df_plot['product_code'].astype(str)!='9999']
-        # -- to allow merge, rename and transform both variables into int
-        dft['hs4'] = dft['hs4'].astype(int)
+        # -- to allow merge, rename and transform to  int
         df_plot['product_code'] = df_plot['product_code'].astype(int)
         if 'color' in df_plot.columns:
             df_plot.drop(['color'],axis=1,inplace=True,errors='ignore')
+        ###############
+        dft = pd.read_csv('https://www.dropbox.com/s/rlm8hu4pq0nkg63/hs4_hex_colors_intl_atlas.csv?dl=1')
+        dft['hs4'] = dft['hs4'].astype(int)
         df_plot = pd.merge(df_plot,dft[['hs4','color']],how='left',left_on='product_code',right_on='hs4')
         # drop column merged from dft
         df_plot.drop(['hs4'],axis=1,inplace=True,errors='ignore')
@@ -185,7 +191,9 @@ def create_product_space(df_plot_dataframe=None,
         nx.draw_networkx(G,nodes_pos, node_color=colorsl,ax=ax,node_size=sizesl2,with_labels=False,alpha=1)
 
         # save file
-        # plt.savefig(output_dir_image)
+        if output_image_file != None:
+            plt.savefig(output_image_file)
 
-        # show the plot
-        plt.show()
+        # if saving to file, dont show the plot
+        if output_image_file == None:
+            plt.show()
