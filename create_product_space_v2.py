@@ -175,7 +175,8 @@ def create_product_space(df_plot_dataframe_filename = None,
         sizesl2 = [G.nodes[n]['node_size']*350 for n in nodes]
 
         # Create matplotlib object to draw the product space
-        f = plt.figure(1,figsize=(20,20))
+        #f = plt.figure(1,figsize=(20,20))
+        f = plt.figure(1,figsize=(50,50))
         ax = f.add_subplot(1,1,1)
 
         # turn axes off
